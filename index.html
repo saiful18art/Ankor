@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+
+<html lang="bn">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>জুনিয়র অংকুর একতা ছাত্র সংসদ</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Serif+Bengali:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080e14;--s1:rgba(255,255,255,.04);--s2:rgba(255,255,255,.08);
+  --bdr:rgba(255,255,255,.08);--bdrg:rgba(99,218,158,.2);
+  --g1:#0d2b1e;--g2:#1a4a32;--gn:#63da9e;--gd:#2dbe7a;
+  --gold:#ffd166;--red:#ff6b6b;--blue:#60a5fa;--purple:#c084fc;
+  --txt:#e8f5ee;--sub:rgba(232,245,238,.5);
+}
+body{font-family:'Hind Siliguri',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 80% 50% at 20% 0%,rgba(45,190,122,.12) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 40% at 80% 100%,rgba(96,165,250,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:fixed;top:0;left:0;right:0;z-index:100;
+background:rgba(8,14,20,.8);backdrop-filter:blur(20px);
+border-bottom:1px solid var(–bdr);padding:10px 14px;
+display:flex;align-items:center;gap:10px;}
+.hico{width:40px;height:40px;border-radius:12px;
+background:linear-gradient(135deg,var(–g2),var(–gd));
+display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+box-shadow:0 0 20px rgba(45,190,122,.3);}
+.htxt h1{font-family:‘Noto Serif Bengali’,serif;font-size:12px;font-weight:700;color:var(–gold);line-height:1.2;}
+.htxt p{font-size:10px;color:var(–sub);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(–red);margin-left:auto;flex-shrink:0;transition:background .3s;}
+.sync-dot.on{background:var(–gn);box-shadow:0 0 8px var(–gn);}
+
+/* NAV */
+nav{position:fixed;top:60px;left:0;right:0;z-index:99;
+background:rgba(8,14,20,.85);backdrop-filter:blur(20px);
+border-bottom:1px solid var(–bdr);
+display:flex;overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+.tb{flex:1;min-width:60px;padding:10px 4px 8px;background:none;border:none;
+color:var(–sub);font-family:‘Hind Siliguri’,sans-serif;font-size:10px;
+cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;
+border-bottom:2px solid transparent;transition:all .25s;}
+.tb span{font-size:16px;}
+.tb.active{color:var(–gn);border-bottom-color:var(–gn);}
+.tb.atb.active{color:var(–purple);border-bottom-color:var(–purple);}
+.tb.atb{color:var(–sub);}
+
+/* PAGES */
+.pg{display:none;padding:130px 12px 30px;position:relative;z-index:1;}
+.pg.active{display:block;animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* GLASS CARD */
+.gc{background:rgba(255,255,255,.04);border:1px solid var(–bdr);
+border-radius:18px;padding:16px;margin-bottom:12px;
+backdrop-filter:blur(10px);position:relative;overflow:hidden;}
+.gc::before{content:’’;position:absolute;inset:0;border-radius:18px;
+background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);pointer-events:none;}
+.gc.green{border-color:var(–bdrg);}
+.gc.gold{border-color:rgba(255,209,102,.2);}
+.gc.red{border-color:rgba(255,107,107,.2);}
+.gc.blue{border-color:rgba(96,165,250,.2);}
+.gc.purple{border-color:rgba(192,132,252,.2);}
+
+/* STATS GRID */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.sc{background:rgba(255,255,255,.04);border:1px solid var(–bdr);border-radius:16px;padding:14px;position:relative;overflow:hidden;}
+.sc::before{content:’’;position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 60%);pointer-events:none;}
+.sc.full{grid-column:1/-1;}
+.sc .lbl{font-size:10px;color:var(–sub);margin-bottom:4px;}
+.sc .val{font-family:‘Noto Serif Bengali’,serif;font-size:22px;font-weight:700;color:var(–gold);}
+.sc .val.g{color:var(–gn);}.sc .val.r{color:var(–red);}.sc .val.b{color:var(–blue);}
+.sc .sub2{font-size:10px;color:var(–sub);margin-top:3px;}
+.pw{background:rgba(255,255,255,.06);border-radius:6px;height:5px;margin-top:8px;overflow:hidden;}
+.pf{height:100%;border-radius:6px;background:linear-gradient(90deg,var(–gd),var(–gn));transition:width 1s ease;}
+
+/* SECTION TITLE */
+.st{font-family:‘Noto Serif Bengali’,serif;font-size:14px;font-weight:700;color:var(–gold);
+margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.st::after{content:’’;flex:1;height:1px;background:var(–bdr);}
+
+/* MEMBER GRID */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mc{background:rgba(255,255,255,.04);border:1px solid var(–bdr);border-radius:16px;
+padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.mc::before{content:’’;position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);pointer-events:none;}
+.mc:active{transform:scale(.97);}
+.mc.paid{border-color:rgba(99,218,158,.3);}
+.mc.due{border-color:rgba(255,107,107,.3);}
+.mav{width:58px;height:58px;border-radius:50%;margin:0 auto 8px;
+display:flex;align-items:center;justify-content:center;
+font-size:22px;font-family:‘Noto Serif Bengali’,serif;color:white;font-weight:700;position:relative;}
+.sdot{position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;border:2px solid var(–bg);}
+.sdot.paid{background:var(–gn);}.sdot.due{background:var(–red);}
+.mname{font-size:11px;font-weight:600;color:var(–txt);margin-bottom:4px;line-height:1.3;}
+.msv{font-size:13px;color:var(–gn);font-weight:700;}
+.mdue2{font-size:10px;color:var(–red);margin-top:2px;}
+.mserial{font-size:9px;color:var(–sub);margin-bottom:4px;}
+
+/* TABLE */
+.tw{background:rgba(255,255,255,.03);border:1px solid var(–bdr);border-radius:16px;overflow:hidden;overflow-x:auto;margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:280px;}
+th{background:rgba(255,255,255,.06);padding:9px 8px;text-align:left;font-size:10px;color:var(–sub);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:var(–txt);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.badge.paid{background:rgba(99,218,158,.15);color:var(–gn);}
+.badge.due{background:rgba(255,107,107,.15);color:var(–red);}
+.badge.partial{background:rgba(255,209,102,.15);color:var(–gold);}
+.badge.ongoing{background:rgba(96,165,250,.15);color:var(–blue);}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center;}
+.mo.open{display:flex;}
+.modal{background:var(–g1);border:1px solid var(–bdrg);border-radius:24px 24px 0 0;
+padding:20px 16px 40px;width:100%;max-width:480px;animation:su .3s ease;max-height:88vh;overflow-y:auto;}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 18px;}
+.mav2{width:72px;height:72px;border-radius:50%;margin:0 auto 12px;
+display:flex;align-items:center;justify-content:center;
+font-size:28px;font-family:‘Noto Serif Bengali’,serif;color:white;font-weight:700;
+border:3px solid var(–gn);}
+.mname2{font-family:‘Noto Serif Bengali’,serif;font-size:18px;font-weight:700;text-align:center;margin-bottom:16px;}
+.mstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.mstat{background:rgba(255,255,255,.05);border:1px solid var(–bdr);border-radius:12px;padding:11px 6px;text-align:center;}
+.mstat .v{font-size:14px;font-weight:700;color:var(–gold);margin-bottom:2px;}
+.mstat .l{font-size:10px;color:var(–sub);}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-family:‘Hind Siliguri’,sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;transition:all .2s;}
+.btn-g{background:linear-gradient(135deg,var(–g2),var(–gd));color:white;}
+.btn-g:active{transform:scale(.98);}
+.btn-r{background:rgba(255,107,107,.12);color:var(–red);border:1px solid rgba(255,107,107,.3);}
+.btn-p{background:linear-gradient(135deg,#6d28d9,#9333ea);color:white;}
+.btn-o{background:transparent;color:var(–sub);border:1px solid var(–bdr);}
+
+/* ADMIN */
+.alock{text-align:center;padding:30px 16px;}
+.alock .lic{font-size:52px;margin-bottom:14px;}
+.alock h2{font-family:‘Noto Serif Bengali’,serif;font-size:18px;color:var(–purple);margin-bottom:8px;}
+.alock p{font-size:13px;color:var(–sub);margin-bottom:20px;line-height:1.7;}
+.inp{width:100%;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid var(–bdr);
+border-radius:12px;color:var(–txt);font-family:‘Hind Siliguri’,sans-serif;font-size:14px;outline:none;margin-bottom:10px;}
+.inp:focus{border-color:var(–purple);}
+.inp.err{border-color:var(–red);animation:shake .3s;}
+.inp.pwi{letter-spacing:3px;text-align:center;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+select.inp{appearance:none;cursor:pointer;}
+.errmsg{color:var(–red);font-size:11px;margin-top:-6px;margin-bottom:8px;display:none;}
+.apanel{display:none;}.apanel.on{display:block;}
+.ahdr{background:linear-gradient(135deg,rgba(109,40,217,.2),rgba(147,51,234,.1));border:1px solid rgba(192,132,252,.3);border-radius:16px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.abadge{background:linear-gradient(135deg,#6d28d9,#9333ea);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:white;}
+.asec{margin-bottom:20px;}
+.asectitle{font-size:12px;font-weight:700;color:var(–purple);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(192,132,252,.2);display:flex;align-items:center;gap:6px;}
+.fg{margin-bottom:10px;}
+.flbl{font-size:11px;color:var(–sub);margin-bottom:4px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px;}
+.smin{background:rgba(255,255,255,.04);border:1px solid var(–bdr);border-radius:12px;padding:11px 6px;text-align:center;}
+.smin .v{font-size:16px;font-weight:700;color:var(–gold);}
+.smin .l{font-size:10px;color:var(–sub);margin-top:2px;}
+
+/* LOG */
+.logi{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:8px;align-items:flex-start;}
+.logi:last-child{border-bottom:none;}
+.ldot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.ltxt{font-size:12px;color:var(–sub);line-height:1.5;}
+.ltime{font-size:10px;color:var(–sub);opacity:.4;margin-top:1px;}
+
+/* CHART */
+.chart-wrap{position:relative;height:200px;margin-top:8px;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,rgba(13,43,30,.8),rgba(26,74,50,.5));
+border:1px solid var(–bdrg);border-radius:20px;padding:20px 16px;margin-bottom:16px;
+text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:‘🌱’;position:absolute;font-size:80px;opacity:.05;top:-10px;right:-10px;}
+.hero .ot{font-family:‘Noto Serif Bengali’,serif;font-size:16px;font-weight:700;color:var(–gold);margin-bottom:4px;}
+.hdiv{width:32px;height:2px;background:var(–gd);margin:8px auto;border-radius:2px;}
+.hero .os{font-size:12px;color:var(–sub);}
+
+/* LOADING */
+.loading{text-align:center;padding:30px;color:var(–sub);font-size:13px;}
+.spinner{width:28px;height:28px;border:3px solid rgba(99,218,158,.2);border-top-color:var(–gn);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+background:rgba(13,43,30,.95);border:1px solid var(–gn);color:var(–txt);
+padding:10px 20px;border-radius:30px;font-size:13px;z-index:999;
+opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(10px);}
+.toast.show{opacity:1;}
+.toast.err{border-color:var(–red);}
+
+footer{text-align:center;padding:16px;font-size:11px;color:var(–sub);opacity:.4;position:relative;z-index:1;}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="hico">🌱</div>
+  <div class="htxt">
+    <h1>জুনিয়র অংকুর একতা ছাত্র সংসদ</h1>
+    <p id="hstatus">সংযোগ হচ্ছে...</p>
+  </div>
+  <div class="sync-dot" id="sdot" title="Firebase sync"></div>
+</header>
+
+<nav>
+  <button class="tb active" onclick="showPage('home',this)"><span>🏠</span>হোম</button>
+  <button class="tb" onclick="showPage('members',this)"><span>👥</span>সদস্য</button>
+  <button class="tb" onclick="showPage('ledger',this)"><span>📊</span>হিসাব</button>
+  <button class="tb" onclick="showPage('chart',this)"><span>📈</span>গ্রাফ</button>
+  <button class="tb" onclick="showPage('about',this)"><span>ℹ️</span>সম্পর্কে</button>
+  <button class="tb atb" onclick="showPage('admin',this)"><span>🛡️</span>Admin</button>
+</nav>
+
+<!-- HOME -->
+
+<div id="page-home" class="pg active">
+  <div class="hero">
+    <div class="ot">জুনিয়র অংকুর একতা ছাত্র সংসদ</div>
+    <div class="hdiv"></div>
+    <div class="os">একতাই বল — সঞ্চয়ে সমৃদ্ধি 🌱</div>
+  </div>
+  <div id="home-loading" class="loading"><div class="spinner"></div>ডেটা লোড হচ্ছে...</div>
+  <div id="home-content" style="display:none">
+    <div class="sg">
+      <div class="sc full gc green"><div class="lbl">💰 মোট ফান্ড</div><div class="val" id="ht">৳ ০</div><div class="sub2" id="hm">— জন সদস্য</div><div class="pw"><div class="pf" id="hp" style="width:0%"></div></div><div class="sub2" id="hg" style="margin-top:5px"></div></div>
+      <div class="sc"><div class="lbl">✅ পরিশোধ</div><div class="val g" id="hpd">৳ ০</div></div>
+      <div class="sc"><div class="lbl">⚠️ বকেয়া</div><div class="val r" id="hdu">৳ ০</div><div class="sub2" id="hdc"></div></div>
+      <div class="sc"><div class="lbl">👥 সদস্য</div><div class="val b" id="hmc">০</div></div>
+      <div class="sc"><div class="lbl">📅 সর্বশেষ মাস</div><div class="val g" id="htm">৳ ০</div><div class="sub2" id="hmn"></div></div>
+    </div>
+    <div class="st">🔔 সাম্প্রতিক কার্যক্রম</div>
+    <div class="tw"><table><tbody id="hact"></tbody></table></div>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+
+<div id="page-members" class="pg">
+  <div class="st">👥 সকল সদস্য</div>
+  <div id="mem-loading" class="loading"><div class="spinner"></div>লোড হচ্ছে...</div>
+  <div class="mg" id="mgrid"></div>
+</div>
+
+<!-- LEDGER -->
+
+<div id="page-ledger" class="pg">
+  <div class="st">📊 সদস্যওয়ারি হিসাব</div>
+  <div class="tw"><table><thead><tr><th>#</th><th>নাম</th><th>জমা</th><th>বকেয়া</th><th>অবস্থা</th></tr></thead><tbody id="lb"></tbody></table></div>
+  <div class="st">📅 মাসওয়ারি হিসাব</div>
+  <div class="tw"><table><thead><tr><th>মাস</th><th>জমা</th><th>অবস্থা</th></tr></thead><tbody id="mb"></tbody></table></div>
+</div>
+
+<!-- CHART -->
+
+<div id="page-chart" class="pg">
+  <div class="st">📈 সঞ্চয় গ্রাফ</div>
+  <div class="gc green">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:10px">মাসওয়ারি আদায়</div>
+    <div class="chart-wrap"><canvas id="monthChart"></canvas></div>
+  </div>
+  <div class="gc blue">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:10px">সদস্যওয়ারি জমা (শীর্ষ ১০)</div>
+    <div class="chart-wrap"><canvas id="memberChart"></canvas></div>
+  </div>
+  <div class="gc gold">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:10px">পরিশোধ অনুপাত</div>
+    <div style="position:relative;height:180px"><canvas id="pieChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+
+<div id="page-about" class="pg">
+  <div class="gc green">
+    <div class="st" style="font-size:13px">🌱 আমাদের সম্পর্কে</div>
+    <p style="font-size:13px;line-height:1.9;color:var(--sub)">জুনিয়র অংকুর একতা ছাত্র সংসদ একটি ছাত্র সঞ্চয় সংগঠন। আমরা একসাথে সঞ্চয় করি, একসাথে এগিয়ে যাই।</p>
+  </div>
+  <div class="gc">
+    <div class="st" style="font-size:13px">📋 নিয়মাবলী</div>
+    <ul style="list-style:none">
+      <li style="font-size:13px;color:var(--sub);padding:7px 0;border-bottom:1px solid var(--bdr);display:flex;gap:8px"><span style="color:var(--gold)">✦</span>প্রতি মাসে নির্ধারিত চাঁদা সময়মতো পরিশোধ করতে হবে।</li>
+      <li style="font-size:13px;color:var(--sub);padding:7px 0;border-bottom:1px solid var(--bdr);display:flex;gap:8px"><span style="color:var(--gold)">✦</span>দুই মাসের বেশি বকেয়া থাকলে বিশেষ ব্যবস্থা নেওয়া হবে।</li>
+      <li style="font-size:13px;color:var(--sub);padding:7px 0;border-bottom:1px solid var(--bdr);display:flex;gap:8px"><span style="color:var(--gold)">✦</span>ফান্ডের অর্থ সকলের সম্মতি ছাড়া উত্তোলন করা যাবে না।</li>
+      <li style="font-size:13px;color:var(--sub);padding:7px 0;display:flex;gap:8px"><span style="color:var(--gold)">✦</span>প্রতি তিন মাসে একবার সভা অনুষ্ঠিত হবে।</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ADMIN -->
+
+<div id="page-admin" class="pg">
+  <div id="admin-lock" class="alock">
+    <div class="lic">🛡️</div>
+    <h2>Admin প্যানেল</h2>
+    <p>শুধুমাত্র অ্যাডমিনিস্ট্রেটরের জন্য।</p>
+    <input type="password" class="inp pwi" id="apw" placeholder="পাসওয়ার্ড" onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <div class="errmsg" id="pwe">❌ ভুল পাসওয়ার্ড!</div>
+    <button class="btn btn-p" onclick="adminLogin()">🔓 প্রবেশ করুন</button>
+  </div>
+
+  <div id="admin-panel" class="apanel">
+    <div class="ahdr">
+      <div style="font-size:24px">🛡️</div>
+      <div><div class="abadge">ADMINISTRATOR</div><div style="font-size:11px;color:var(--purple);margin-top:3px">Firebase Real-time Sync ✅</div></div>
+      <button onclick="adminLogout()" style="margin-left:auto;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3);color:var(--red);padding:6px 10px;border-radius:10px;font-size:11px;cursor:pointer;">লগআউট</button>
+    </div>
+
+```
+<div class="asec">
+  <div class="asectitle">📊 সারসংক্ষেপ</div>
+  <div class="srow">
+    <div class="smin"><div class="v" id="at">৳০</div><div class="l">মোট ফান্ড</div></div>
+    <div class="smin"><div class="v" id="ad" style="color:var(--red)">৳০</div><div class="l">বকেয়া</div></div>
+    <div class="smin"><div class="v" id="am">০</div><div class="l">সদস্য</div></div>
+  </div>
+</div>
+
+<div class="asec">
+  <div class="asectitle">💳 টাকা আপডেট</div>
+  <div class="fg"><div class="flbl">সদস্য</div><select class="inp" id="pms"></select></div>
+  <div class="frow">
+    <div><div class="flbl">পরিমাণ (৳)</div><input type="number" class="inp" id="pam" placeholder="৫০০"/></div>
+    <div><div class="flbl">ধরন</div><select class="inp" id="pty"><option value="add">জমা যোগ</option><option value="due">বকেয়া যোগ</option><option value="clear">বকেয়া মাফ</option></select></div>
+  </div>
+  <div class="fg"><div class="flbl">নোট (ঐচ্ছিক)</div><input type="text" class="inp" id="pno" placeholder="যেমন: মার্চ মাসের চাঁদা"/></div>
+  <button class="btn btn-g" onclick="updatePayment()">✅ আপডেট করুন</button>
+</div>
+
+<div class="asec">
+  <div class="asectitle">📅 মাসিক এন্ট্রি</div>
+  <div class="frow">
+    <div><div class="flbl">মাস</div><select class="inp" id="msel"><option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option selected>মার্চ</option><option>এপ্রিল</option><option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option><option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option></select></div>
+    <div><div class="flbl">বছর</div><input type="number" class="inp" id="myr" value="2026"/></div>
+  </div>
+  <div class="frow">
+    <div><div class="flbl">আদায় (৳)</div><input type="number" class="inp" id="mamt" placeholder="৭০০০"/></div>
+    <div><div class="flbl">অবস্থা</div><select class="inp" id="mst"><option value="done">সম্পন্ন</option><option value="partial">আংশিক</option><option value="ongoing">চলমান</option></select></div>
+  </div>
+  <button class="btn btn-g" onclick="addMonthEntry()">📥 এন্ট্রি যোগ</button>
+</div>
+
+<div class="asec">
+  <div class="asectitle">➕ নতুন সদস্য</div>
+  <div class="fg"><div class="flbl">নাম (বাংলায়)</div><input type="text" class="inp" id="nname" placeholder="যেমন: রহিম উদ্দিন"/></div>
+  <div class="frow">
+    <div><div class="flbl">প্রাথমিক জমা (৳)</div><input type="number" class="inp" id="nsaved" placeholder="০"/></div>
+    <div><div class="flbl">বকেয়া (৳)</div><input type="number" class="inp" id="ndue" placeholder="০"/></div>
+  </div>
+  <button class="btn btn-g" onclick="addMember()">➕ যোগ করুন</button>
+</div>
+
+<div class="asec">
+  <div class="asectitle">🗑️ সদস্য বাদ</div>
+  <div class="fg"><div class="flbl">সদস্য</div><select class="inp" id="rms"></select></div>
+  <button class="btn btn-r" onclick="removeMember()">🗑️ বাদ দিন</button>
+</div>
+
+<div class="asec">
+  <div class="asectitle">🎯 ফান্ড লক্ষ্য</div>
+  <div class="fg"><div class="flbl">লক্ষ্য (৳)</div><input type="number" class="inp" id="gi" placeholder="৬০০০০"/></div>
+  <button class="btn btn-g" onclick="updateGoal()">🎯 আপডেট</button>
+</div>
+
+<div class="asec">
+  <div class="asectitle">🔑 পাসওয়ার্ড পরিবর্তন</div>
+  <div class="fg"><div class="flbl">বর্তমান</div><input type="password" class="inp" id="cpw" placeholder="বর্তমান পাসওয়ার্ড"/></div>
+  <div class="fg"><div class="flbl">নতুন</div><input type="password" class="inp" id="npw" placeholder="নতুন পাসওয়ার্ড"/></div>
+  <button class="btn btn-p" onclick="changePassword()">🔑 পরিবর্তন করুন</button>
+</div>
+
+<div class="asec">
+  <div class="asectitle">📋 কার্যক্রম লগ</div>
+  <div class="gc"><div id="alog"></div></div>
+</div>
+
+<div class="asec">
+  <div class="asectitle">⚠️ বিপজ্জনক</div>
+  <button class="btn btn-r" onclick="resetAll()">🔄 সকল ডেটা রিসেট</button>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<div class="mo" id="mm" onclick="if(event.target.id==='mm')closeMo()">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mav2" id="mav2"></div>
+    <div class="mname2" id="mname2"></div>
+    <div class="mstats">
+      <div class="mstat"><div class="v" id="msv"></div><div class="l">মোট জমা</div></div>
+      <div class="mstat"><div class="v" id="mdu" style="color:var(--red)"></div><div class="l">বকেয়া</div></div>
+      <div class="mstat"><div class="v" id="mmo"></div><div class="l">মাস</div></div>
+    </div>
+    <div id="mst2" style="text-align:center;margin-bottom:10px"></div>
+    <button class="btn btn-o" onclick="closeMo()">বন্ধ</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer>© ২০২৬ জুনিয়র অংকুর একতা ছাত্র সংসদ • Firebase Powered</footer>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {getDatabase,ref,onValue,set,get,update,remove,push} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyABv5chwu4XlgMIlDSTaLMnzoMQU4uliUM",
+  authDomain:"ankor-aff92.firebaseapp.com",
+  databaseURL:"https://ankor-aff92-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"ankor-aff92",
+  storageBucket:"ankor-aff92.firebasestorage.app",
+  messagingSenderId:"284474428558",
+  appId:"1:284474428558:web:d25d62dd87f012b24b9698"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+let PASS="ankor2026";
+let loggedIn=false;
+let goal=60000;
+let members=[];
+let monthly=[];
+let logs=[];
+let charts={};
+
+const colors=["#2dbe7a","#60a5fa","#c084fc","#ffd166","#ff6b6b","#34d399","#f472b6","#fb923c","#a78bfa","#22d3ee","#4ade80","#facc15","#f87171","#818cf8"];
+
+function fmt(n){return "৳\u00a0"+Number(n||0).toLocaleString();}
+function total(){return members.reduce((s,m)=>s+(m.saved||0),0);}
+function totalDue(){return members.reduce((s,m)=>s+(m.due||0),0);}
+function dueCount(){return members.filter(m=>(m.due||0)>0).length;}
+
+function showToast(msg,err=false){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.className="toast"+(err?" err":"")+" show";
+  setTimeout(()=>t.className="toast",2800);
+}
+
+// Firebase listeners
+onValue(ref(db,"settings"),(snap)=>{
+  const d=snap.val()||{};
+  if(d.password) PASS=d.password;
+  if(d.goal) goal=d.goal;
+  document.getElementById("gi").value=goal;
+});
+
+onValue(ref(db,"members"),(snap)=>{
+  members=[];
+  const d=snap.val()||{};
+  Object.entries(d).forEach(([k,v])=>members.push({...v,_key:k}));
+  members.sort((a,b)=>(a.id||0)-(b.id||0));
+  document.getElementById("sdot").className="sync-dot on";
+  document.getElementById("hstatus").textContent="সদস্য: "+members.length+" জন • লাইভ";
+  document.getElementById("home-loading").style.display="none";
+  document.getElementById("home-content").style.display="block";
+  document.getElementById("mem-loading").style.display="none";
+  renderAll();
+});
+
+onValue(ref(db,"monthly"),(snap)=>{
+  monthly=[];
+  const d=snap.val()||{};
+  Object.entries(d).forEach(([k,v])=>monthly.push({...v,_key:k}));
+  renderAll();
+});
+
+onValue(ref(db,"logs"),(snap)=>{
+  logs=[];
+  const d=snap.val()||{};
+  Object.entries(d).forEach(([k,v])=>logs.push({...v,_key:k}));
+  logs.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  renderAll();
+});
+
+async function initDefaults(){
+  const snap=await get(ref(db,"members"));
+  if(!snap.exists()){
+    const defaults=[
+      {id:1,name:"সাইফুল ইসলাম",saved:3500,due:0,months:7},
+      {id:2,name:"জসিম উদ্দিন",saved:3500,due:0,months:7},
+      {id:3,name:"নুর হোসেন বাবুল",saved:3000,due:500,months:6},
+      {id:4,name:"আজম উদ্দিন",saved:3500,due:0,months:7},
+      {id:5,name:"সাজ্জাদ",saved:3000,due:500,months:6},
+      {id:6,name:"মোস্তফা",saved:2500,due:1000,months:5},
+      {id:7,name:"নুর হাফেজ",saved:3500,due:0,months:7},
+      {id:8,name:"জয়নাল",saved:3500,due:0,months:7},
+      {id:9,name:"নুরনবী",saved:3000,due:0,months:6},
+      {id:10,name:"এহছান",saved:3500,due:0,months:7},
+      {id:11,name:"মানিক",saved:3500,due:0,months:7},
+      {id:12,name:"কবির",saved:3000,due:0,months:6},
+      {id:13,name:"এরশাদ",saved:3000,due:0,months:6},
+      {id:14,name:"হাসান",saved:3000,due:0,months:6},
+    ];
+    for(const m of defaults) await push(ref(db,"members"),m);
+    const mths=[
+      {month:"জানুয়ারি ২০২৬",amount:7000,status:"done"},
+      {month:"ফেব্রুয়ারি ২০২৬",amount:6500,status:"partial"},
+      {month:"মার্চ ২০২৬",amount:3000,status:"ongoing"},
+    ];
+    for(const m of mths) await push(ref(db,"monthly"),m);
+    await set(ref(db,"settings"),{goal:60000,password:"ankor2026"});
+    await push(ref(db,"logs"),{text:"অ্যাপ চালু হয়েছে",color:"#63da9e",ts:Date.now()});
+  }
+}
+initDefaults();
+
+function renderHome(){
+  const tot=total(),due=totalDue(),paid=tot-due;
+  const pct=Math.min(100,Math.round(tot/goal*100));
+  const last=monthly.length?monthly[monthly.length-1]:{amount:0,month:"—"};
+  document.getElementById("ht").textContent=fmt(tot);
+  document.getElementById("hm").textContent=members.length+" জন সদস্যের মোট জমা";
+  document.getElementById("hpd").textContent=fmt(paid);
+  document.getElementById("hdu").textContent=fmt(due);
+  document.getElementById("hdc").textContent=dueCount()+" জনের বকেয়া";
+  document.getElementById("hmc").textContent=members.length;
+  document.getElementById("htm").textContent=fmt(last.amount);
+  document.getElementById("hmn").textContent=last.month;
+  document.getElementById("hp").style.width=pct+"%";
+  document.getElementById("hg").textContent="লক্ষ্য: "+fmt(goal)+" ("+pct+"% সম্পন্ন)";
+  document.getElementById("hact").innerHTML=logs.slice(0,6).map(l=>`
+    <tr>
+      <td style="width:10px"><div style="width:7px;height:7px;border-radius:50%;background:${l.color};margin:auto"></div></td>
+      <td style="font-size:12px">${l.text}</td>
+      <td style="font-size:10px;opacity:.4;white-space:nowrap">${l.time||""}</td>
+    </tr>`).join("");
+}
+
+function renderMembers(){
+  document.getElementById("mgrid").innerHTML=members.map((m,i)=>{
+    const c=colors[i%colors.length];
+    return `<div class="mc ${(m.due||0)>0?'due':'paid'}" onclick="openMo('${m._key}')">
+      <div class="mserial">#${m.id||i+1}</div>
+      <div class="mav" style="background:linear-gradient(135deg,${c}99,${c})">
+        ${(m.name||"?").charAt(0)}
+        <div class="sdot ${(m.due||0)>0?'due':'paid'}"></div>
+      </div>
+      <div class="mname">${m.name||""}</div>
+      <div class="msv">${fmt(m.saved||0)}</div>
+      ${(m.due||0)>0?`<div class="mdue2">বকেয়া: ${fmt(m.due)}</div>`:`<div style="font-size:10px;color:var(--gn);margin-top:2px">✓ পরিশোধিত</div>`}
+    </div>`;
+  }).join("");
+}
+
+function renderLedger(){
+  document.getElementById("lb").innerHTML=members.map((m,i)=>`
+    <tr>
+      <td style="opacity:.4">${m.id||i+1}</td>
+      <td>${m.name||""}</td>
+      <td style="color:var(--gn);font-weight:600">${fmt(m.saved||0)}</td>
+      <td style="color:${(m.due||0)>0?'var(--red)':'var(--gn)'}">${(m.due||0)>0?fmt(m.due):'—'}</td>
+      <td><span class="badge ${(m.due||0)>0?'due':'paid'}">${(m.due||0)>0?'বকেয়া':'পরিশোধ'}</span></td>
+    </tr>`).join("");
+  const sl={done:'paid',partial:'partial',ongoing:'ongoing'};
+  const nl={done:'সম্পন্ন',partial:'আংশিক',ongoing:'চলমান'};
+  document.getElementById("mb").innerHTML=monthly.map(md=>`
+    <tr>
+      <td>${md.month||""}</td>
+      <td style="color:var(--gn);font-weight:600">${fmt(md.amount||0)}</td>
+      <td><span class="badge ${sl[md.status]||'partial'}">${nl[md.status]||md.status}</span></td>
+    </tr>`).join("");
+}
+
+function renderCharts(){
+  const mLabels=monthly.map(m=>m.month||"").slice(-6);
+  const mData=monthly.map(m=>m.amount||0).slice(-6);
+  if(charts.month) charts.month.destroy();
+  const mc=document.getElementById("monthChart");
+  if(mc){
+    charts.month=new Chart(mc,{type:'bar',data:{labels:mLabels,datasets:[{label:'আদায়',data:mData,backgroundColor:'rgba(45,190,122,.6)',borderColor:'#2dbe7a',borderWidth:1,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(232,245,238,.5)',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'rgba(232,245,238,.5)',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+  }
+  const top=members.slice().sort((a,b)=>(b.saved||0)-(a.saved||0)).slice(0,10);
+  if(charts.member) charts.member.destroy();
+  const bc=document.getElementById("memberChart");
+  if(bc){
+    charts.member=new Chart(bc,{type:'bar',data:{labels:top.map(m=>m.name||""),datasets:[{label:'জমা',data:top.map(m=>m.saved||0),backgroundColor:colors.slice(0,10).map(c=>c+'99'),borderColor:colors.slice(0,10),borderWidth:1,borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(232,245,238,.5)',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'rgba(232,245,238,.5)',font:{size:9}},grid:{display:false}}}}});
+  }
+  const paid=members.filter(m=>(m.due||0)===0).length;
+  const due2=members.filter(m=>(m.due||0)>0).length;
+  if(charts.pie) charts.pie.destroy();
+  const pc=document.getElementById("pieChart");
+  if(pc){
+    charts.pie=new Chart(pc,{type:'doughnut',data:{labels:['পরিশোধ','বকেয়া'],datasets:[{data:[paid,due2],backgroundColor:['rgba(45,190,122,.7)','rgba(255,107,107,.7)'],borderColor:['#2dbe7a','#ff6b6b'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(232,245,238,.7)',font:{size:11}}}}}});
+  }
+}
+
+window.openMo=function(key){
+  const m=members.find(x=>x._key===key);
+  if(!m) return;
+  const i=members.indexOf(m);
+  const c=colors[i%colors.length];
+  document.getElementById("mav2").style.background=`linear-gradient(135deg,${c}99,${c})`;
+  document.getElementById("mav2").textContent=(m.name||"?").charAt(0);
+  document.getElementById("mname2").textContent=m.name||"";
+  document.getElementById("msv").textContent=fmt(m.saved||0);
+  document.getElementById("mdu").textContent=(m.due||0)>0?fmt(m.due):"—";
+  document.getElementById("mmo").textContent=(m.months||0)+" মাস";
+  document.getElementById("mst2").innerHTML=`<span class="badge ${(m.due||0)>0?'due':'paid'}">${(m.due||0)>0?'⚠️ বকেয়া আছে':'✅ সব পরিশোধিত'}</span>`;
+  document.getElementById("mm").classList.add("open");
+};
+window.closeMo=function(){document.getElementById("mm").classList.remove("open");};
+
+window.showPage=function(id,btn){
+  document.querySelectorAll(".pg").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tb").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  if(btn) btn.classList.add("active");
+  if(id==="admin"&&!loggedIn){
+    document.getElementById("admin-lock").style.display="block";
+    document.getElementById("admin-panel").classList.remove("on");
+  }
+  if(id==="chart") setTimeout(renderCharts,100);
+};
+
+window.adminLogin=function(){
+  const pw=document.getElementById("apw").value;
+  const err=document.getElementById("pwe");
+  const inp=document.getElementById("apw");
+  if(pw===PASS){
+    loggedIn=true;
+    document.getElementById("admin-lock").style.display="none";
+    document.getElementById("admin-panel").classList.add("on");
+    renderAdmin();showToast("✅ Admin প্যানেলে স্বাগতম!");
+    inp.value="";err.style.display="none";
+  }else{
+    err.style.display="block";inp.classList.add("err");
+    setTimeout(()=>inp.classList.remove("err"),400);inp.value="";
+  }
+};
+
+window.adminLogout=function(){
+  loggedIn=false;
+  document.getElementById("admin-lock").style.display="block";
+  document.getElementById("admin-panel").classList.remove("on");
+  showToast("লগআউট সফল!");
+};
+
+function renderAdmin(){
+  document.getElementById("at").textContent=fmt(total());
+  document.getElementById("ad").textContent=fmt(totalDue());
+  document.getElementById("am").textContent=members.length;
+  document.getElementById("gi").value=goal;
+  ["pms","rms"].forEach(sid=>{
+    document.getElementById(sid).innerHTML=members.map((m,i)=>`<option value="${m._key}">${(m.id||i+1)}. ${m.name||""}</option>`).join("");
+  });
+  document.getElementById("alog").innerHTML=logs.slice(0,10).map(l=>`
+    <div class="logi">
+      <div class="ldot" style="background:${l.color||'#63da9e'}"></div>
+      <div><div class="ltxt">${l.text||""}</div><div class="ltime">${l.time||""}</div></div>
+    </div>`).join("")||`<div style="font-size:13px;opacity:.4;text-align:center;padding:10px">কোনো কার্যক্রম নেই</div>`;
+}
+
+async function addLog(text,color="#63da9e"){
+  const now=new Date();
+  const time=now.getDate()+" "+["জানু","ফেব্রু","মার্চ","এপ্রি","মে","জুন","জুলা","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"][now.getMonth()];
+  await push(ref(db,"logs"),{text,color,time,ts:Date.now()});
+}
+
+window.updatePayment=async function(){
+  const key=document.getElementById("pms").value;
+  const amt=parseInt(document.getElementById("pam").value)||0;
+  const type=document.getElementById("pty").value;
+  const note=document.getElementById("pno").value;
+  const m=members.find(x=>x._key===key);
+  if(!m||(amt<=0&&type!=="clear")){showToast("পরিমাণ সঠিকভাবে দিন",true);return;}
+  const updates={};
+  if(type==="add"){
+    updates.saved=(m.saved||0)+amt;
+    updates.months=Math.floor(updates.saved/500);
+    updates.due=m.due||0;
+    await addLog(m.name+" — "+fmt(amt)+" জমা"+(note?" ("+note+")":""),"#63da9e");
+    showToast("✅ "+fmt(amt)+" জমা হয়েছে!");
+  }else if(type==="due"){
+    updates.due=(m.due||0)+amt;
+    updates.saved=m.saved||0;
+    await addLog(m.name+" — "+fmt(amt)+" বকেয়া"+(note?" ("+note+")":""),"#ff6b6b");
+    showToast("⚠️ বকেয়া আপডেট!");
+  }else{
+    await addLog(m.name+" — বকেয়া "+fmt(m.due||0)+" মাফ","#63da9e");
+    updates.due=0;updates.saved=m.saved||0;
+    showToast("✅ বকেয়া মাফ হয়েছে!");
+  }
+  await update(ref(db,"members/"+key),updates);
+  document.getElementById("pam").value="";document.getElementById("pno").value="";
+  renderAdmin();
+};
+
+window.addMonthEntry=async function(){
+  const month=document.getElementById("msel").value;
+  const year=document.getElementById("myr").value;
+  const amt=parseInt(document.getElementById("mamt").value)||0;
+  const st=document.getElementById("mst").value;
+  if(!amt){showToast("পরিমাণ দিন",true);return;}
+  const label=month+" "+year;
+  const ex=monthly.find(m=>m.month===label);
+  if(ex) await update(ref(db,"monthly/"+ex._key),{amount:amt,status:st});
+  else await push(ref(db,"monthly"),{month:label,amount:amt,status:st});
+  await addLog(label+" — "+fmt(amt)+" এন্ট্রি","#ffd166");
+  showToast("📅 মাসিক হিসাব যোগ হয়েছে!");renderAdmin();
+};
+
+window.addMember=async function(){
+  const name=document.getElementById("nname").value.trim();
+  const saved=parseInt(document.getElementById("nsaved").value)||0;
+  const due=parseInt(document.getElementById("ndue").value)||0;
+  if(!name){showToast("নাম লিখুন",true);return;}
+  const newId=(members.length?Math.max(...members.map(m=>m.id||0))+1:1);
+  await push(ref(db,"members"),{id:newId,name,saved,due,months:Math.floor(saved/500)});
+  document.getElementById("nname").value="";document.getElementById("nsaved").value="";document.getElementById("ndue").value="";
+  await addLog("নতুন সদস্য: "+name,"#c084fc");
+  showToast("✅ সদস্য যোগ হয়েছে!");renderAdmin();
+};
+
+window.removeMember=async function(){
+  const key=document.getElementById("rms").value;
+  const m=members.find(x=>x._key===key);
+  if(!m) return;
+  if(!confirm(m.name+" কে বাদ দিতে চান?")) return;
+  await remove(ref(db,"members/"+key));
+  await addLog("সদস্য বাদ: "+m.name,"#ff6b6b");
+  showToast("🗑️ সদস্য বাদ দেওয়া হয়েছে!");renderAdmin();
+};
+
+window.updateGoal=async function(){
+  const g=parseInt(document.getElementById("gi").value)||0;
+  if(g<=0){showToast("সঠিক লক্ষ্য দিন",true);return;}
+  await update(ref(db,"settings"),{goal:g});
+  await addLog("ফান্ড লক্ষ্য: "+fmt(g),"#ffd166");
+  showToast("🎯 লক্ষ্য আপডেট হয়েছে!");
+};
+
+window.changePassword=async function(){
+  const cur=document.getElementById("cpw").value;
+  const nw=document.getElementById("npw").value;
+  if(cur!==PASS){showToast("বর্তমান পাসওয়ার্ড ভুল!",true);return;}
+  if(nw.length<4){showToast("কমপক্ষে ৪ অক্ষর দিন",true);return;}
+  await update(ref(db,"settings"),{password:nw});
+  document.getElementById("cpw").value="";document.getElementById("npw").value="";
+  await addLog("পাসওয়ার্ড পরিবর্তন","#c084fc");
+  showToast("🔑 পাসওয়ার্ড পরিবর্তন সফল!");
+};
+
+window.resetAll=async function(){
+  if(!confirm("সমস্ত ডেটা রিসেট হবে! নিশ্চিত?")) return;
+  for(const m of members) await update(ref(db,"members/"+m._key),{saved:0,due:0,months:0});
+  await set(ref(db,"monthly"),null);
+  await push(ref(db,"logs"),{text:"সকল ডেটা রিসেট",color:"#ff6b6b",time:"এইমাত্র",ts:Date.now()});
+  showToast("🔄 রিসেট সম্পন্ন!");renderAdmin();
+};
+
+function renderAll(){
+  renderHome();renderMembers();renderLedger();
+  if(loggedIn) renderAdmin();
+}
+</script>
+
+</body>
+</html>
